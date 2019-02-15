@@ -1,5 +1,5 @@
 Flask-RESTful==0.3.6
 Flask-JWT==0.3.2
 Flask-SQLAlchemy==2.3.2
-
+PyMySQL==0.9.3
 # pip install -r requirements.txt
