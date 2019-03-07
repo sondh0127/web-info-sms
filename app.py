@@ -3,11 +3,10 @@ from flask_restful import Api
 from flask_jwt_extended import JWTManager, get_jwt_identity, jwt_required, get_jwt_claims
 
 from models.account import AccountModel
-from helper.authorization import admin_required, tutor_required
 
 from resources.account import UserRegistration, UserLogin, TutorRegistration, StudentRegistration
-from resources.classes import Class, ClassList, RemoveStudent
-from resources.students import Enroll, StudentEnroll
+from resources.classes import Class, ClassList
+from resources.enroll import Enroll, StudentEnroll, RemoveStudent
 
 
 app = Flask(__name__)
@@ -35,12 +34,13 @@ def user_identity_lookup(user):
     return user.email
 
 
-api.add_resource(TutorRegistration, '/tutor/register')
-api.add_resource(StudentRegistration, '/register')
 api.add_resource(UserLogin, '/login')
+api.add_resource(TutorRegistration, '/register/tutor')
 api.add_resource(Class, '/class/<string:name>')
 api.add_resource(ClassList, '/classes')
 api.add_resource(RemoveStudent, '/class/<string:name>/<int:student_id>')
+
+api.add_resource(StudentRegistration, '/register')
 api.add_resource(Enroll, '/enroll/<string:name>')
 api.add_resource(StudentEnroll, '/enrolls')
 
@@ -48,19 +48,8 @@ api.add_resource(StudentEnroll, '/enrolls')
 @app.route('/test')
 def test():
     return jsonify({
-        'username2': app.config['ADMIN']['username'],
-        'password2': app.config['ADMIN']['password']
-    })
-
-
-@app.route('/protect')
-@jwt_required
-# @admin_required
-def method_name():
-    claims = get_jwt_claims()
-    return jsonify({
-        'identity': get_jwt_identity(),
-        'role': claims['role']
+        'username': app.config['ADMIN']['username'],
+        'password': app.config['ADMIN']['password']
     })
 
 

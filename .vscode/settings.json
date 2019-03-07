@@ -1,6 +1,6 @@
 {
   // "python.linting.pylintEnabled": true,
-  "python.pythonPath": "/home/sondh/.pyenv/versions/anaconda3-2018.12/envs/crudflask/bin/python",
+  "python.pythonPath": "/home/sondh/.pyenv/versions/anaconda3-2018.12/bin/python",
   "python.linting.pylintArgs": [
     "--load-plugins",
     "pylint_flask",

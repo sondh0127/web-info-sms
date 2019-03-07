@@ -15,6 +15,12 @@ class AccountModel(db.Model):
     role = db.Column(
         db.Enum('tutor', 'student', 'admin', name='user_roles'), default='student')
 
+    def __init__(self, name, email, password, role):
+        self.name = name
+        self.email = email
+        self.set_password(password)
+        self.role = role
+
     @validates('name')
     def validate_name(self, key, name):
         if not name:
@@ -42,6 +48,7 @@ class AccountModel(db.Model):
         if not password:
             raise AssertionError('Password not provided')
 
+        # no space ?
         if not re.match('.*[0-9].*', password):
             raise AssertionError(
                 'Password must contain 1 number')
@@ -54,12 +61,6 @@ class AccountModel(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-
-    def __init__(self, name, email, password, role):
-        self.name = name
-        self.email = email
-        self.set_password(password)
-        self.role = role
 
     def save_to_db(self):
         db.session.add(self)

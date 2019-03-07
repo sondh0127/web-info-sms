@@ -3,7 +3,7 @@ from flask_restful import Resource, reqparse
 from flask_jwt_extended import (
     create_access_token, jwt_required, get_jwt_identity, get_jwt_claims)
 from flask import current_app
-from helper.authorization import admin_required, tutor_required
+from helper.authorization import requires_access_role
 
 
 class UserRegistration(Resource):
@@ -11,7 +11,6 @@ class UserRegistration(Resource):
         self.role = role
 
     def post(self):
-        # print(self.role)
         parser = reqparse.RequestParser()
         parser.add_argument(
             'name',
@@ -43,6 +42,7 @@ class UserRegistration(Resource):
             access_token = create_access_token(identity=new_user)
             return {
                 'message': 'User {} was created'.format(data['email']),
+                'role': self.role,
                 'access_token': access_token,
             }
         except AssertionError as exception_message:
@@ -97,7 +97,7 @@ class TutorRegistration(UserRegistration):
     def __init__(self):
         super().__init__('tutor')
 
-    @admin_required
+    @requires_access_role('admin')
     def post(self):
         return super().post()
 

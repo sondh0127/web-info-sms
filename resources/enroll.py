@@ -1,9 +1,27 @@
 from flask_restful import Resource, reqparse
 from helper.authorization import requires_access_role
-from models.classes import ClassModel, EnrollModel
-from models.account import AccountModel
+from models.classes import ClassModel
+from models.enroll import EnrollModel
 from flask_jwt_extended import get_jwt_claims, get_jwt_identity
 from flask import jsonify
+
+
+class RemoveStudent(Resource):
+    @requires_access_role('tutor')
+    def delete(self, name, student_id):
+        my_id = get_jwt_claims()['id']
+
+        try:
+            my_class = ClassModel.find_by_name_with_tutor(name)
+            if my_class:
+                enroll = EnrollModel.deactive(student_id, my_class.id)
+                return {
+                    'message': 'Remove student {} successfully!'.format(student_id),
+                    'isRemoved': enroll.isRemoved
+                }, 201
+            return {'message': 'Class not found or the class is not your own !'}
+        except AssertionError as exception_message:
+            return {'message': 'Error: {}.'.format(exception_message)}, 400
 
 
 class Enroll(Resource):
@@ -27,7 +45,7 @@ class Enroll(Resource):
                     enroll.save_to_db()
                     return {
                         'message': 'Enroll {} successfully!'.format(data['name']),
-                        'students': [c.id for c in enroll_class.students]
+                        'class': enroll_class.json()
                     }, 201
                 return {'message': 'No slot available or you cannot register this class'}
             return {'message': 'Class not found!'}
