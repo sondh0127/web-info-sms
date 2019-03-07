@@ -1,5 +1,9 @@
 # Development setup
 
+- I use docker for create mysql server. So, please install docker-compose for the setting up env.
+- https://docs.docker.com/compose/install/
+- We also need to stop mysql-services on local system to free 3306 port.
+
 ## Install library requirement
 
 `pip install -r requirements.txt`
@@ -10,7 +14,7 @@
 
 - Note: The seed database also provided in docker container.
 
-- Account for login:
+# Account for login:
 
 - For tutor:
 
