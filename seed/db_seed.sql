@@ -23,12 +23,15 @@ DROP TABLE IF EXISTS `accounts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `accounts` (
-  `email` text,
-  `password_hash` text,
-  `role` text,
-  `id` int(11) DEFAULT NULL,
-  `name` text
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password_hash` varchar(128) DEFAULT NULL,
+  `role` enum('tutor','student','admin') DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `ix_accounts_email` (`email`),
+  KEY `ix_accounts_name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -37,7 +40,7 @@ CREATE TABLE `accounts` (
 
 LOCK TABLES `accounts` WRITE;
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
-INSERT INTO `accounts` VALUES ('test1@gmail.com','pbkdf2:sha256:50000$QTCUDYp5$f673d6f6381570d711056a834cfb696cdd3390c1ef0c5fc43a353940b7111a11','tutor',6,'test1Name'),('test2@gmail.com','pbkdf2:sha256:50000$mMiVvMl0$8c375ce8d41685eec43f02dbfee182b3cec582ce3572a012d0c7682524e1209c','tutor',7,'test2Name'),('test3@gmail.com','pbkdf2:sha256:50000$QWHsQXG1$96fecd30e8344c599fd08d33e81deec8bcb46ea728f2af5c97bd37cdc6131a75','tutor',8,'tutor'),('test4@gmail.com','pbkdf2:sha256:50000$G5cEpOhK$60d256b0ab752257aaf12d875e3a30408424a20a6d3027b0d4e034f797c86a10','tutor',9,'tutor2'),('student1@gmail.com','pbkdf2:sha256:50000$gqerH1mn$63f7e5ce1f9ef32d15980bdbd55d79d83ea13845500fd7b279ebc111a9fa04a4','student',10,'Do Hong Son'),('test5@gmail.com','pbkdf2:sha256:50000$5nlWkyLm$3bf37067f25c6eb52f6902abb3bc9c8b6f83b682751bb9a1bb68aaa417990c77','tutor',12,'tutor5'),('student2@gmail.com','pbkdf2:sha256:50000$ygBo2pmt$8a45683bba1bd9108290114f2fe8b1169972dc222c37b316c0c295f7e93a5ce5','student',13,'Student 2'),('student3@gmail.com','pbkdf2:sha256:50000$AQjNSlQZ$3c4b75d3bf4365cbc3f5aadd41cf4f851ab45f42d1286f29e3758aa36687d3ea','student',14,'Student 3'),('test6@gmail.com','pbkdf2:sha256:50000$i3TrBjtD$74d93bb12144266f765dceb422c840aba63e9cea64313b3ff4d6b75d83f31bcc','tutor',15,'tutor6');
+INSERT INTO `accounts` VALUES (10,'tutor1','test1@gmail.com','pbkdf2:sha256:50000$bkZANTOg$570448aecc90f03eda6dcb2f44ec52a0cc17f1c9df9206bd241d79166d0ae1ea','tutor'),(11,'tutor2','test2@gmail.com','pbkdf2:sha256:50000$9gy4UdL2$58745c7323566de8b453ee77947126d274f2f7ddedcaf8a00804339f891753cb','tutor'),(12,'tutor3','test3@gmail.com','pbkdf2:sha256:50000$nUfVBbsI$b3b082e526922fca2146241267fe4decc142463efa8d0006725bf4ffccf08c29','tutor'),(13,'tutor4','test4@gmail.com','pbkdf2:sha256:50000$xCVebIhU$65694469b899683de77bbd060572daff88a1422fb523dbae1d0dc759592d9711','tutor'),(14,'tutor5','test5@gmail.com','pbkdf2:sha256:50000$z2SRzHGY$ed22648f9803d2b25aafd4c064f2681eb8bda299ed2d7773a785b589fb13aee7','tutor'),(15,'tutor6','test6@gmail.com','pbkdf2:sha256:50000$KmSn0NgG$f63b415e22a1706f115118afc746a0f1eed94548331889afbfe9a0b656067231','tutor'),(16,'Student 1','student1@gmail.com','pbkdf2:sha256:50000$77NZ2qBm$bad5fbf65424440c65ccc7e0baa3512d656dd3a19ff01ba8b8f298ed12a39a84','student'),(17,'Student 2','student2@gmail.com','pbkdf2:sha256:50000$kROTWWPb$a2987edc639ecc1eb420d8c15c98d9a3580384a8f6a53c0106d34518947d52c6','student'),(18,'Student 3','student3@gmail.com','pbkdf2:sha256:50000$Sib8KYM1$9fb55b7b6d95c0ab2642ad9ddc9993fdfd8c905e479a57dffc8a0b2824b93c34','student');
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -49,12 +52,16 @@ DROP TABLE IF EXISTS `classes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `classes` (
-  `student_limit` int(11) DEFAULT NULL,
-  `status` text,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `student_limit` int(11) NOT NULL,
+  `status` enum('active','deleted') DEFAULT NULL,
   `tutor_id` int(11) DEFAULT NULL,
-  `id` int(11) DEFAULT NULL,
-  `name` text
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  KEY `tutor_id` (`tutor_id`),
+  CONSTRAINT `classes_ibfk_1` FOREIGN KEY (`tutor_id`) REFERENCES `accounts` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -63,7 +70,7 @@ CREATE TABLE `classes` (
 
 LOCK TABLES `classes` WRITE;
 /*!40000 ALTER TABLE `classes` DISABLE KEYS */;
-INSERT INTO `classes` VALUES (15,'active',7,1,'Class1'),(15,'active',8,3,'Class3'),(15,'active',8,4,'Class4'),(15,'deleted',6,5,'Class1.1'),(10,'deleted',12,6,'Class55'),(1,'deleted',7,7,'Class66');
+INSERT INTO `classes` VALUES (1,'Class1Tutor1',12,'active',10),(2,'Class2Tutor1',15,'deleted',10),(3,'Class3Tutor1',15,'active',10),(4,'Class21Tutor2',15,'active',11),(5,'Class22Tutor2',15,'active',11),(6,'Class23Tutor2',14,'active',11),(7,'Class31Tutor3',14,'active',12);
 /*!40000 ALTER TABLE `classes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -75,9 +82,13 @@ DROP TABLE IF EXISTS `enrolls`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `enrolls` (
-  `class_id` int(11) DEFAULT NULL,
-  `student_id` int(11) DEFAULT NULL,
-  `isRemoved` int(11) DEFAULT NULL
+  `student_id` int(11) NOT NULL,
+  `class_id` int(11) NOT NULL,
+  `isRemoved` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`student_id`,`class_id`),
+  KEY `class_id` (`class_id`),
+  CONSTRAINT `enrolls_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `accounts` (`id`),
+  CONSTRAINT `enrolls_ibfk_2` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -87,7 +98,7 @@ CREATE TABLE `enrolls` (
 
 LOCK TABLES `enrolls` WRITE;
 /*!40000 ALTER TABLE `enrolls` DISABLE KEYS */;
-INSERT INTO `enrolls` VALUES (1,10,1),(3,10,0),(4,10,0),(1,13,0),(3,13,1),(4,13,0);
+INSERT INTO `enrolls` VALUES (16,1,1),(16,3,0),(16,4,1),(16,5,0),(17,1,0),(17,5,0),(17,7,0),(18,1,0),(18,3,0),(18,4,0);
 /*!40000 ALTER TABLE `enrolls` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -100,4 +111,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-03-07 22:40:18
+-- Dump completed on 2019-03-08  0:48:10

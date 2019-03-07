@@ -48,7 +48,10 @@ class AccountModel(db.Model):
         if not password:
             raise AssertionError('Password not provided')
 
-        # no space ?
+        if re.match('.*\s.*', password):
+            raise AssertionError(
+                'Password can not have space')
+
         if not re.match('.*[0-9].*', password):
             raise AssertionError(
                 'Password must contain 1 number')
