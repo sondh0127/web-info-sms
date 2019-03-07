@@ -40,11 +40,28 @@ class EnrollModel(db.Model):
 
     @classmethod
     def deactive(cls, student_id, class_id):
-        enroll = cls.query.filter_by(
-            student_id=student_id, class_id=class_id).first()
+        enroll = cls.get_by_student_and_class(
+            student_id=student_id, class_id=class_id)
+        if enroll.isRemoved:
+            raise AssertionError('Enroll already deactived')
         enroll.isRemoved = True
         db.session.commit()
         return enroll
+
+    @classmethod
+    def get_by_student_and_class(cls, student_id, class_id):
+        return cls.query.filter_by(
+            student_id=student_id, class_id=class_id).first()
+
+    @classmethod
+    def get_by_student(cls, id):
+        return EnrollModel.query.filter(
+            EnrollModel.student_id == id, EnrollModel.isRemoved == False).all()
+
+    @classmethod
+    def get_by_class(cls, id):
+        return EnrollModel.query.filter(
+            EnrollModel.class_id == id, EnrollModel.isRemoved == False).all()
 
     # enrolls = db.Table(
     #     'enrolls',
@@ -97,9 +114,13 @@ class ClassModel(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def delete_from_db(self):
-        db.session.delete(self)
-        db.session.commit()
+    # def delete_from_db(self):
+    #     db.session.delete(self)
+    #     db.session.commit()
+
+    def getStudents(self):
+        enrolls = EnrollModel.get_by_class(self.id)
+        return [s.student.name for s in enrolls]
 
     def json(self):
         return {
@@ -108,7 +129,7 @@ class ClassModel(db.Model):
             'student_limit': self.student_limit,
             'status': self.status,
             'tutor_id': self.tutor_id,
-            'student_num': len(self.students)
+            'student_num': len(self.getStudents())
         }
 
     def get_students(self):
@@ -116,6 +137,13 @@ class ClassModel(db.Model):
 
     def isAvailable(self):
         return len(self.students) < self.student_limit
+
+    def isDeleted(self):
+        return self.status == 'deleted'
+
+    def markDelete(self):
+        self.status = 'deleted'
+        db.session.commit()
 
     @classmethod
     def find_by_name_with_tutor(cls, name):

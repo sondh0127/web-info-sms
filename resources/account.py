@@ -75,6 +75,7 @@ class UserLogin(Resource):
                 access_token = create_access_token(identity=user)
                 return {
                     'message': 'Logged in as admin',
+                    'role': user.role,
                     'access_token': access_token,
                 }
         else:
@@ -86,6 +87,7 @@ class UserLogin(Resource):
                 access_token = create_access_token(identity=user)
                 return {
                     'message': 'Logged in as {} ({})'.format(user.role, user.email),
+                    'role': user.role,
                     'access_token': access_token,
                 }
             return {'message': 'Wrong credentials'}

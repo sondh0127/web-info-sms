@@ -22,7 +22,7 @@ class Enroll(Resource):
             enroll_class = ClassModel.find_by_name(name)
             student_id = get_jwt_claims()['id']
             if enroll_class:
-                if enroll_class.isAvailable():
+                if enroll_class.isAvailable() and not EnrollModel.get_by_student_and_class(student_id, enroll_class.id):
                     enroll = EnrollModel(student_id, enroll_class.id)
                     enroll.save_to_db()
                     return {
@@ -44,10 +44,10 @@ class Enroll(Resource):
             student_id = get_jwt_claims()['id']
             if enroll_class:
                 enroll = EnrollModel.deactive(
-                    student_id.id, enroll_class.id)
+                    student_id, enroll_class.id)
                 return {
-                    'message': 'Enroll {} successfully!'.format(data['name']),
-                    'students': enroll.isRemoved
+                    'message': 'Deregistered {} successfully!'.format(data['name']),
+                    'isRemoved': enroll.isRemoved
                 }, 201
             return {'message': 'Class not found!'}
 
@@ -59,6 +59,6 @@ class StudentEnroll(Resource):
     @requires_access_role('student')
     # get the enroll class of the students
     def get(self):
-        user = AccountModel.find_by_id(get_jwt_claims()['id'])
-        classes = [c.name for c in user.classes]
+        enrolls = EnrollModel.get_by_student(get_jwt_claims()['id'])
+        classes = [c.classes.json() for c in enrolls]
         return {'classes': classes}

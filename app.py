@@ -48,8 +48,8 @@ api.add_resource(StudentEnroll, '/enrolls')
 @app.route('/test')
 def test():
     return jsonify({
-        'username': app.config['ADMIN']['username'],
-        'password': app.config['ADMIN']['password']
+        'username2': app.config['ADMIN']['username'],
+        'password2': app.config['ADMIN']['password']
     })
 
 

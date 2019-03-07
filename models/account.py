@@ -13,7 +13,7 @@ class AccountModel(db.Model):
     email = db.Column(db.String(255), index=True, unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     role = db.Column(
-        db.Enum('tutor', 'student', 'admin', name='user_roles'), default='tutor')
+        db.Enum('tutor', 'student', 'admin', name='user_roles'), default='student')
 
     @validates('name')
     def validate_name(self, key, name):
@@ -64,6 +64,13 @@ class AccountModel(db.Model):
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
+
+    def json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'email': self.email,
+        }
 
     @classmethod
     def find_by_email(cls, email):
